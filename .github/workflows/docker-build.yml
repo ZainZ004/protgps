@@ -10,7 +10,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.event.repository.name }}
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build-and-push:
@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -41,12 +41,13 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=${{ github.sha }}
-            type=raw,value=${{ github.event_name != 'pull_request' && github.ref_name }}
-            type=raw,value=${{ github.event_name == 'pull_request' && github.head_ref }}
-            type=raw,value=${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && github.ref_name }}
-            type=raw,value=${{ github.event_name == 'push' && startsWith(github.ref, 'refs/heads/') && github.ref_name }}
-
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,format=short
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') || github.ref == format('refs/heads/{0}', 'master') }}
+      
       - name: Build and Push Image
         uses: docker/build-push-action@v4
         with:
