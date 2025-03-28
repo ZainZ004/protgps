@@ -1,4 +1,4 @@
-FROM condaforge/miniforge3:latest
+FROM pytorch/pytorch:2.6.0-cuda12.4-cudnn9-runtime
 
 WORKDIR /app
 
@@ -20,13 +20,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy environment.yml to take advantage of Docker cache
 COPY environment.yml .
-RUN mamba env create -f environment.yml \
-    && mamba clean --all -f -y \
-    && mamba run -n protgps pip install jupyterlab \
-    && mamba run -n protgps pip cache purge \
+RUN conda env create -f environment.yml \
+    && conda clean --all -f -y \
+    && conda run -n protgps pip install jupyterlab \
+    && conda run -n protgps pip cache purge \
     && wget -q "https://zenodo.org/records/14795445/files/checkpoints.zip?download=1" -O checkpoints.zip \
     && unzip checkpoints.zip -d . \
-    && mv checkpoints/* checkpoints/protgps/ \
+    && mv checkpoints/protgps/* checkpoints/protgps/ \
     && rm -rf checkpoints.zip
 
 # 复制所有项目文件
