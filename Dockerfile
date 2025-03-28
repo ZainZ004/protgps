@@ -15,8 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
-    && mkdir -p checkpoints/protgps checkpoints/esm2 checkpoints/drbert \
-    && echo "conda activate protgps" >> ~/.bashrc
+    && mkdir -p checkpoints/protgps checkpoints/esm2 checkpoints/drbert
 
 # Copy environment.yml to take advantage of Docker cache
 COPY environment.yml .
