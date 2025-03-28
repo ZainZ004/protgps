@@ -22,7 +22,9 @@ COPY environment.yml .
 RUN conda env create -f environment.yml \
     && conda clean --all -f -y \
     && conda run -n protgps pip install jupyterlab \
-    && conda run -n protgps pip cache purge 
+    && conda run -n protgps pip cache purge \
+    && conda init bash \
+    && echo "conda activate protgps" >> ~/.bashrc
 
 # Checkpoints changes quickly, add a layer to keep the cache
 RUN wget -q "https://zenodo.org/records/14795445/files/checkpoints.zip?download=1" -O checkpoints.zip \
@@ -36,4 +38,4 @@ COPY . /app/
 EXPOSE 8888
 
 # Set entrypoint to run JupyterLab
-ENTRYPOINT ["/bin/bash", "-c", "conda init bash && source /root/.bashrc && conda activate protgps && jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password=''"]
+ENTRYPOINT ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''", "--NotebookApp.password=''"]
